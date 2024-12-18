@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*!* Ensure the layout fits the viewport height on mobile *!*/
+/*@media (max-width: 768px) {*/
+/*    html,*/
+/*    body {*/
+/*        max-height: 100vh;*/
+/*        overflow: hidden; !* Prevent scrolling of the outer page *!*/
+/*    }*/
+
+/*    .messages-container {*/
+/*        max-height: calc(100vh - 144px); !* Adjust for header and input padding *!*/
+/*        overflow-y: auto; !* Allow scrolling for this container only *!*/
+/*    }*/
+/*}*/
+
+/*!* Desktop: Keep the regular behavior *!*/
+/*@media (min-width: 768px) {*/
+/*    .messages-container {*/
+/*        max-height: 75vh; !* Retain scrollable chat area on larger screens *!*/
+/*        overflow-y: auto;*/
+/*    }*/
+/*}*/

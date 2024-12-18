@@ -2,10 +2,12 @@ import {useEffect, useState} from "react";
 import {useSelector} from "react-redux";
 import {RootState} from "../store/store.ts";
 import {BASE_URL, ENDPOINT_PATHS} from "../Constants/URLs.ts";
+import {Link} from "react-router-dom";
 
 export default function Chats() {
 
     interface Chat {
+        id: string;
         chatName: string;
         friendUsername: string | null; // Null for group chats
     }
@@ -16,10 +18,11 @@ export default function Chats() {
     //     { chatName: "Personal", friendUsername: "jane_smith" },
     // ];
 
-    interface newChatDTO{
-        chatName: string;
-        friendUsername: string;
-    }
+    // interface newChatDTO{
+    //     id: string;
+    //     chatName: string;
+    //     friendUsername: string;
+    // }
     const [chats, setChats] = useState<Chat[]>([])
 
     useEffect(()=>{
@@ -34,6 +37,7 @@ export default function Chats() {
                 console.log("get all chats response: " + JSON.stringify(response))
                 response.json().then((result)=>{
                     setChats(result)
+
                     console.log("result from get all chats json: " + JSON.stringify(result))
                 })
             })
@@ -45,11 +49,12 @@ export default function Chats() {
     const [chatName, setChatName] = useState(""); // Input for chat name
     const [friendName, setFriendName] = useState(""); // Input for friend's name
 
-    function handleSubmit(e) {
+    function handleSubmit(e: { preventDefault: () => void; }) {
         e.preventDefault();
 
-    //     we have the chat name and the friend user name
-        const newChat: newChatDTO = {
+    //     we have the chat name and the friend username
+        const newChat: Chat = {
+            id: "",
             chatName: chatName,
             friendUsername: friendName
         }
@@ -75,6 +80,7 @@ export default function Chats() {
                 setChatName("");
                 setFriendName("");
             }
+
         })
     }
 
@@ -90,23 +96,52 @@ export default function Chats() {
                     New Chat
                 </button>
             </div>
+
             <ul className="space-y-3">
-                {chats.map((chat, index) => (
+                {chats.map((chat) => (
                     <li
-                        key={index}
+                        key={chat.id}
                         className="border p-3 rounded-lg shadow bg-gray-100 hover:bg-gray-200"
                     >
-                        <p className="text-lg font-medium">{chat.chatName}</p>
-                        {chat.friendUsername && (
-                            <p className="text-gray-600">
-                                with <span className="font-bold">{chat.friendUsername}</span>
-                            </p>
-                        )}
+                        {/* Chat listing is now clickable */}
+                        <Link
+                            to={{
+                                pathname: `/messages/${chat.id}`,
+                            }}
+                            state={{
+                                chatName: chat.chatName,
+                                friendUsername: chat.friendUsername,
+                            }}
+                            className="block"
+                        >
+                            <p className="text-lg font-medium">{chat.chatName}</p>
+                            {chat.friendUsername && (
+                                <p className="text-gray-600">
+                                    with <span className="font-bold">{chat.friendUsername}</span>
+                                </p>
+                            )}
+                        </Link>
                     </li>
                 ))}
             </ul>
 
-            {/* Overlay for the Create Chat Form */}
+            {/*<ul className="space-y-3">*/}
+            {/*    {chats.map((chat, index) => (*/}
+            {/*        <li*/}
+            {/*            key={index}*/}
+            {/*            className="border p-3 rounded-lg shadow bg-gray-100 hover:bg-gray-200"*/}
+
+            {/*        >*/}
+            {/*            <p className="text-lg font-medium">{chat.chatName}</p>*/}
+            {/*            {chat.friendUsername && (*/}
+            {/*                <p className="text-gray-600">*/}
+            {/*                    with <span className="font-bold">{chat.friendUsername}</span>*/}
+            {/*                </p>*/}
+            {/*            )}*/}
+            {/*        </li>*/}
+            {/*    ))}*/}
+            {/*</ul>*/}
+
             {isOverlayOpen && (
                 <div
                     className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
@@ -114,7 +149,8 @@ export default function Chats() {
                         if (e.target === e.currentTarget) setIsOverlayOpen(false);
                     }}
                 >
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+                    {/* Responsive width for overlay dialog */}
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-4/5 sm:w-1/3">
                         <h2 className="text-xl font-bold mb-4">Create New Chat</h2>
                         <form>
                             <div className="mb-4">
@@ -171,6 +207,73 @@ export default function Chats() {
                     </div>
                 </div>
             )}
+
+            {/*OKAY*/}
+            {/* Overlay for the Create Chat Form */}
+            {/*{isOverlayOpen && (*/}
+            {/*    <div*/}
+            {/*        className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"*/}
+            {/*        onClick={(e) => {*/}
+            {/*            if (e.target === e.currentTarget) setIsOverlayOpen(false);*/}
+            {/*        }}*/}
+            {/*    >*/}
+            {/*        <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">*/}
+            {/*            <h2 className="text-xl font-bold mb-4">Create New Chat</h2>*/}
+            {/*            <form>*/}
+            {/*                <div className="mb-4">*/}
+            {/*                    <label*/}
+            {/*                        htmlFor="chat-name"*/}
+            {/*                        className="block text-sm font-medium text-gray-600"*/}
+            {/*                    >*/}
+            {/*                        Chat Name*/}
+            {/*                    </label>*/}
+            {/*                    <input*/}
+            {/*                        id="chat-name"*/}
+            {/*                        type="text"*/}
+            {/*                        value={chatName}*/}
+            {/*                        onChange={(e) => setChatName(e.target.value)}*/}
+            {/*                        className="mt-1 block w-full p-2 border rounded-lg"*/}
+            {/*                        placeholder="Enter chat name"*/}
+            {/*                        required*/}
+            {/*                    />*/}
+            {/*                </div>*/}
+            {/*                <div className="mb-4">*/}
+            {/*                    <label*/}
+            {/*                        htmlFor="friend-name"*/}
+            {/*                        className="block text-sm font-medium text-gray-600"*/}
+            {/*                    >*/}
+            {/*                        Friend's Username*/}
+            {/*                    </label>*/}
+            {/*                    <input*/}
+            {/*                        id="friend-name"*/}
+            {/*                        type="text"*/}
+            {/*                        value={friendName}*/}
+            {/*                        onChange={(e) => setFriendName(e.target.value)}*/}
+            {/*                        className="mt-1 block w-full p-2 border rounded-lg"*/}
+            {/*                        placeholder="Enter friend's username"*/}
+            {/*                        required*/}
+            {/*                    />*/}
+            {/*                </div>*/}
+            {/*                <div className="flex items-center justify-between">*/}
+            {/*                    <button*/}
+            {/*                        type="button"*/}
+            {/*                        onClick={handleSubmit}*/}
+            {/*                        className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"*/}
+            {/*                    >*/}
+            {/*                        Create*/}
+            {/*                    </button>*/}
+            {/*                    <button*/}
+            {/*                        type="button"*/}
+            {/*                        onClick={() => setIsOverlayOpen(false)}*/}
+            {/*                        className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"*/}
+            {/*                    >*/}
+            {/*                        Cancel*/}
+            {/*                    </button>*/}
+            {/*                </div>*/}
+            {/*            </form>*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
+            {/*)}*/}
         </div>
     )
 }
